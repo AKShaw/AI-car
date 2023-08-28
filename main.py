@@ -1,5 +1,5 @@
 import argparse
-from sandbox.simple_sandbox_2d import SimpleSandbox2D
+from sandbox.simple_2d_sandbox.game import SimpleSandbox2D
 
 
 def get_args():

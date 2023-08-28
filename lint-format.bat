@@ -1,2 +1,2 @@
-black src/*
-flake8 --max-line-length 88 src/
+black sandbox/*
+flake8 --max-line-length 88 sandbox/

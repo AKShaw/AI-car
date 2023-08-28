@@ -1,22 +1,22 @@
-import pygame
+import pygame as pg
 
 
 class Texture:
-    texture: pygame.Surface
+    texture: pg.Surface
     angle: float = 0
-    pivot: pygame.Vector2
+    pivot: pg.Vector2
 
     def __init__(
         self,
         texture_image_path: str,
         display_angle: float = 0,
         scale: float = 1,
-        pivot: pygame.Vector2 = pygame.Vector2(0, 0),
+        pivot: pg.Vector2 = pg.Vector2(0, 0),
     ):
         self.pivot = pivot
 
-        self._original_texture = pygame.image.load(texture_image_path)
-        self.texture = pygame.image.load(texture_image_path)
+        self._original_texture = pg.image.load(texture_image_path)
+        self.texture = pg.image.load(texture_image_path)
         self.scale(scale)
 
         # Change texture to have desired display angle
@@ -35,7 +35,7 @@ class Texture:
         )
 
         new_size = (current_width * scale, current_height * scale)
-        self._original_texture = pygame.transform.smoothscale(
+        self._original_texture = pg.transform.smoothscale(
             self._original_texture, new_size
         )
 
@@ -46,5 +46,8 @@ class Texture:
             to_angle: The angle to rotate the texture to.
         """
         # TODO: Rotate around center
-        self.texture = pygame.transform.rotate(self._original_texture, -to_angle)
+        self.texture = pg.transform.rotate(self._original_texture, -to_angle)
         self.angle = to_angle % 360
+        
+    def draw(self, position: pg.Vector2):
+        pass

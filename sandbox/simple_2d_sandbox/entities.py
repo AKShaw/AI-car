@@ -1,22 +1,22 @@
 import math
 from abc import ABC
 
-import pygame
+import pygame as pg
 
 from sandbox.simple_2d_sandbox.textures import Texture
 
 
 class Entity(ABC):
     texture: Texture
-    position: pygame.Vector2
+    position: pg.Vector2
 
     dt: int  # Time since last tick (for frame rate independant physics)
 
-    def __init__(self, texture: Texture, position: pygame.Vector2):
+    def __init__(self, texture: Texture, position: pg.Vector2):
         self.texture = texture
         self.position = position
 
-    def draw(self, screen: pygame.Surface):
+    def draw(self, screen: pg.Surface):
         """
         Draw the texture onto the given screen.
         Args:
@@ -51,24 +51,22 @@ class Car(Entity):
     but we decay it when "w" is not held so it can be analogous to RPM"""
     rpm = 0
 
-    def __init__(self, texture: Texture, position: pygame.Vector2):
+    def __init__(self, texture: Texture, position: pg.Vector2):
         super().__init__(texture, position)
 
     def movement(self, pressed_keys: list):
         # Update current speed
         self.speed = self._engine_power_curve(self.rpm)
-        print(self.rpm)
-        print(self.speed)
 
         if self.rpm > 5.5:
             self.rpm = 5.5
         elif self.rpm < -3:
             self.rpm = -3
 
-        forward = pressed_keys[pygame.K_w]
-        backwards = pressed_keys[pygame.K_s]
-        left = pressed_keys[pygame.K_a]
-        right = pressed_keys[pygame.K_d]
+        forward = pressed_keys[pg.K_w]
+        backwards = pressed_keys[pg.K_s]
+        left = pressed_keys[pg.K_a]
+        right = pressed_keys[pg.K_d]
 
         if forward:
             # Braking
@@ -109,7 +107,7 @@ class Car(Entity):
         else:
             return rpm * 120
 
-    def _update_pos(self, current_pos: pygame.Vector2, dt, speed, heading: float):
+    def _update_pos(self, current_pos: pg.Vector2, dt, speed, heading: float):
         current_x = current_pos.x
         current_y = current_pos.y
 
@@ -119,7 +117,7 @@ class Car(Entity):
 
         return current_pos
 
-    def draw(self, screen: pygame.Surface):
+    def draw(self, screen: pg.Surface):
         """
         Draw the texture onto the given screen.
         Args:
@@ -129,5 +127,5 @@ class Car(Entity):
 
         # end_x = self.position.x + 75 * math.sin(math.radians(self.texture.angle))
         # end_y = self.position.y - 75 * math.cos(math.radians(self.texture.angle))
-        # end = pygame.Vector2(end_x, end_y)
-        # pygame.draw.line(screen, "green", self.position, end, width=5)
+        # end = pg.Vector2(end_x, end_y)
+        # pg.draw.line(screen, "green", self.position, end, width=5)

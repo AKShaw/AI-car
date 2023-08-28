@@ -40,10 +40,10 @@ class Entity(ABC):
 
 
 class Car(Entity):
-    ACCELERATION_CONST = 2
+    ACCELERATION_CONST = 3
     REVERSE_CONST = 1
     COASTING_CONST = 0.5
-    BRAKING_CONST = 3.5
+    BRAKING_CONST = 4
 
     speed = 0
 
@@ -58,8 +58,10 @@ class Car(Entity):
         # Update current speed
         self.speed = self._engine_power_curve(self.rpm)
 
-        if self.rpm > 5.5:
-            self.rpm = 5.5
+        # print(f"RPM: {self.rpm:.2f}")
+
+        if self.rpm > 10:
+            self.rpm = 10
         elif self.rpm < -3:
             self.rpm = -3
 
@@ -90,22 +92,39 @@ class Car(Entity):
             else:
                 self.rpm -= self.REVERSE_CONST * self.dt
 
+        # Steering
         if left:
-            self.texture.rotate(self.texture.angle - 5)
+            angle = self._allowed_turning_angle(self.rpm)
+            self.texture.rotate(self.texture.angle - angle)
         if right:
-            self.texture.rotate(self.texture.angle + 5)
+            angle = self._allowed_turning_angle(self.rpm)
+            self.texture.rotate(self.texture.angle + angle)
 
         self.position = self._update_pos(
             self.position, self.dt, self.speed, self.texture.angle
         )
 
     def _engine_power_curve(self, rpm):
-        if rpm > 5:
-            return 600
-        if rpm < -2:
-            return -200
+        return rpm * 120
+
+    def _allowed_turning_angle(self, rpm):
+        # max_angle = -math.log(abs(rpm))**2+5
+        max_angle = 0
+
+        # TODO: Find better settings
+        rpm = abs(rpm)
+        if rpm < 2:
+            max_angle = rpm*1.5
+        elif rpm > 6:
+            max_angle = rpm*0.8
         else:
-            return rpm * 120
+            max_angle = rpm*1
+
+        if max_angle < 0:
+            max_angle = 0
+        print(f"Max angle: {max_angle:.2f}")
+        return max_angle
+
 
     def _update_pos(self, current_pos: pg.Vector2, dt, speed, heading: float):
         current_x = current_pos.x

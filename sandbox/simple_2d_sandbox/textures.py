@@ -1,4 +1,17 @@
+from enum import Enum
+
 import pygame as pg
+
+
+class DrawMode(Enum):
+    """
+    Controls how to draw a texture to the screen.
+        Centered = Draw centered around a point
+        Top Left = Draw from the top left.
+    """
+
+    CENTERED = 0
+    TOP_LEFT = 1
 
 
 class Texture:
@@ -45,15 +58,32 @@ class Texture:
         Args:
             to_angle: The angle to rotate the texture to.
         """
-        # TODO: Rotate around center
         self.texture = pg.transform.rotate(self._original_texture, -to_angle)
         self.angle = to_angle % 360
-        
-    def draw(self, surface: pg.Surface, position: pg.Vector2):
+
+    def draw(
+        self,
+        surface: pg.Surface,
+        position: pg.Vector2,
+        draw_mode: DrawMode = DrawMode.CENTERED,
+    ):
         """
         Draw the texture onto the given surface at a positon.
         Args:
+            draw_mode: The draw mode enum.
             position: The position to draw to.
             surface: The surface to draw to.
         """
-        surface.blit(self.texture, position)
+
+        if draw_mode == DrawMode.TOP_LEFT:
+            surface.blit(self.texture, position)
+        elif draw_mode == DrawMode.CENTERED:
+            height = self.texture.get_height()
+            width = self.texture.get_width()
+
+            adjustment = pg.Vector2(width/2, height/2)
+            position = position - adjustment
+            surface.blit(self.texture, position)
+            pg.draw.rect(surface, "blue", self.texture.get_rect(topleft=position), width=2)
+        else:
+            raise ValueError("Invalid draw_mode value.")

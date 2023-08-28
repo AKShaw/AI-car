@@ -54,10 +54,7 @@ class SimpleSandbox2D:
                     scale=0.2,
                     pivot=pg.Vector2(25, 70),
                 ),
-                # pg.Vector2(0,0)
-                pg.Vector2(
-                    self._window.get_width() / 2, self._window.get_height() / 2
-                ),
+                pg.Vector2(self._window.get_width() / 2, self._window.get_height() / 2),
             )
         )
 
@@ -69,7 +66,6 @@ class SimpleSandbox2D:
         self._running = False
 
     def _game_loop(self):
-        # TODO: Refactor and make proper physics
         try:
             dt = 0
 

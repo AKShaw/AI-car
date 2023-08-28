@@ -50,10 +50,11 @@ class SimpleSandbox2D:
             Car(
                 Texture(
                     "resources/images/car.png",
-                    texture_angle=90,
                     display_angle=0,
                     scale=0.2,
+                    pivot=pygame.Vector2(25, 70),
                 ),
+                # pygame.Vector2(0,0)
                 pygame.Vector2(
                     self._screen.get_width() / 2, self._screen.get_height() / 2
                 ),

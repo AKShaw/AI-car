@@ -16,13 +16,13 @@ class Entity(ABC):
         self.texture = texture
         self.position = position
 
-    def draw(self, screen: pg.Surface):
+    def draw(self, surface: pg.Surface):
         """
-        Draw the texture onto the given screen.
+        Draw the texture onto the given surface.
         Args:
-            screen: The screen to draw to.
+            surface: The surface to draw to.
         """
-        screen.blit(self.texture.texture, self.position)
+        self.texture.draw(surface, self.position)
 
     def set_dt(self, dt):
         """
@@ -116,16 +116,3 @@ class Car(Entity):
         current_pos.update(new_x, new_y)
 
         return current_pos
-
-    def draw(self, screen: pg.Surface):
-        """
-        Draw the texture onto the given screen.
-        Args:
-            screen: The screen to draw to.
-        """
-        screen.blit(self.texture.texture, self.position)
-
-        # end_x = self.position.x + 75 * math.sin(math.radians(self.texture.angle))
-        # end_y = self.position.y - 75 * math.cos(math.radians(self.texture.angle))
-        # end = pg.Vector2(end_x, end_y)
-        # pg.draw.line(screen, "green", self.position, end, width=5)

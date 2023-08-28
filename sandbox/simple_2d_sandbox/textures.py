@@ -49,5 +49,11 @@ class Texture:
         self.texture = pg.transform.rotate(self._original_texture, -to_angle)
         self.angle = to_angle % 360
         
-    def draw(self, position: pg.Vector2):
-        pass
+    def draw(self, surface: pg.Surface, position: pg.Vector2):
+        """
+        Draw the texture onto the given surface at a positon.
+        Args:
+            position: The position to draw to.
+            surface: The surface to draw to.
+        """
+        surface.blit(self.texture, position)

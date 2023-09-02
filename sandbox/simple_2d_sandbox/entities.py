@@ -2,6 +2,7 @@ import math
 from abc import ABC
 
 import pygame as pg
+import pygame.font
 
 from sandbox.simple_2d_sandbox.textures import Texture
 
@@ -54,6 +55,14 @@ class Car(Entity):
     def __init__(self, texture: Texture, position: pg.Vector2):
         super().__init__(texture, position)
 
+    def draw(self, surface: pg.Surface):
+        super().draw(surface)
+        font = pygame.font.SysFont(None, 24)
+        speedometer = font.render(f"Speed: {self.speed:.2f}, RPM: {self.rpm:.2f}", True, "black")
+        turning = font.render(f"Max angle: {self._allowed_turning_angle(self.rpm):.2f}", True, "black")
+        surface.blit(speedometer, (10, 10))
+        surface.blit(turning, (10, 36))
+
     def movement(self, pressed_keys: list):
         # Update current speed
         self.speed = self._engine_power_curve(self.rpm)
@@ -93,11 +102,12 @@ class Car(Entity):
                 self.rpm -= self.REVERSE_CONST * self.dt
 
         # Steering
+        angle = self._allowed_turning_angle(self.rpm)
+        if self.speed < 0:
+            angle *= -1
         if left:
-            angle = self._allowed_turning_angle(self.rpm)
             self.texture.rotate(self.texture.angle - angle)
         if right:
-            angle = self._allowed_turning_angle(self.rpm)
             self.texture.rotate(self.texture.angle + angle)
 
         self.position = self._update_pos(
@@ -108,21 +118,16 @@ class Car(Entity):
         return rpm * 120
 
     def _allowed_turning_angle(self, rpm):
-        # max_angle = -math.log(abs(rpm))**2+5
-        max_angle = 0
-
-        # TODO: Find better settings
         rpm = abs(rpm)
-        if rpm < 2:
-            max_angle = rpm*1.5
-        elif rpm > 6:
-            max_angle = rpm*0.8
-        else:
-            max_angle = rpm*1
+        if rpm < 2.5:
+            max_angle = rpm * 2
+        elif rpm >= 2.5 and rpm < 7:
+            max_angle = 5
+        elif rpm >= 7:
+            max_angle = -(rpm-12)
 
         if max_angle < 0:
             max_angle = 0
-        print(f"Max angle: {max_angle:.2f}")
         return max_angle
 
 

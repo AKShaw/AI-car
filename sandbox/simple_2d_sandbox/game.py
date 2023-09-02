@@ -1,6 +1,8 @@
 import os
 
+import numpy as np
 import pygame as pg
+import pygame.font
 
 from sandbox.simple_2d_sandbox.entities import Entity, Car
 from sandbox.simple_2d_sandbox.textures import Texture
@@ -50,11 +52,12 @@ class SimpleSandbox2D:
             Car(
                 Texture(
                     "resources/images/car.png",
-                    display_angle=0,
-                    scale=0.2,
+                    display_angle=45,
+                    scale=0.1,
                     pivot=pg.Vector2(25, 70),
                 ),
-                pg.Vector2(self._window.get_width() / 2, self._window.get_height() / 2),
+                pg.Vector2(120, 900)
+                # pg.Vector2(self._window.get_width() / 2, self._window.get_height() / 2),
             )
         )
 
@@ -67,7 +70,8 @@ class SimpleSandbox2D:
 
     def _game_loop(self):
         try:
-            dt = 0
+            dt = 1/self.tps
+            screen_scale = list(np.array(self.resolution) / np.array([1920, 1080]))[0]
 
             while self._running:
                 # poll for events
@@ -77,7 +81,14 @@ class SimpleSandbox2D:
                         self.stop()
 
                 # fill the screen with a color to wipe away anything from last frame
-                self._window.fill("white")
+                self._window.blit(Texture("resources/images/spa.png",
+                                          display_angle=0,
+                                          scale=screen_scale,
+                                          pivot=None).texture, (0, 0))
+
+                font = pygame.font.SysFont(None, 24)
+                fps_counter = font.render(f"FPS: {1/dt:.2f}", True, "black")
+                self._window.blit(fps_counter, (self.resolution[0]-100, 10))
 
                 keys = pg.key.get_pressed()
                 for entity in self._entities:

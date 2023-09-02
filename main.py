@@ -14,7 +14,7 @@ def get_args():
     parser.add_argument(
         "--resolution",
         type=int,
-        default=[1280, 720],
+        default=[1920, 1080],
         nargs=2,
         help="Sandbox window size (width, heigh) in pixels.",
     )

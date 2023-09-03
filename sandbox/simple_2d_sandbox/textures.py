@@ -81,9 +81,11 @@ class Texture:
             height = self.texture.get_height()
             width = self.texture.get_width()
 
-            adjustment = pg.Vector2(width/2, height/2)
+            adjustment = pg.Vector2(width / 2, height / 2)
             position = position - adjustment
             surface.blit(self.texture, position)
-            pg.draw.rect(surface, "blue", self.texture.get_rect(topleft=position), width=2)
+            pg.draw.rect(
+                surface, "blue", self.texture.get_rect(topleft=position), width=2
+            )
         else:
             raise ValueError("Invalid draw_mode value.")

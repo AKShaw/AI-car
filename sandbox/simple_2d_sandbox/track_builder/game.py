@@ -1,17 +1,16 @@
-import os
 import argparse
+from pathlib import Path
 
 import numpy as np
 import pygame as pg
 import pygame.font
 
-from sandbox.simple_2d_sandbox.entities import Entity, Car
-from sandbox.simple_2d_sandbox.textures import Texture
+from sandbox.simple_2d_sandbox.entities import Entity, TrackBuilder
 
 
-class SimpleSandbox2D:
+class SimpleSandbox2DTrackBuilder:
     """
-    2D sandbox with simple physics implemented in pg.
+    2D sandbox track builder
 
     Attributes:
         tps: Ticks per second. Defaults to 60.
@@ -21,8 +20,8 @@ class SimpleSandbox2D:
 
     # Attributes
     tps: int
-    headless: bool
     resolution: list[int]
+    save_location: Path
 
     # PyGame
     _window: pg.Surface
@@ -31,37 +30,21 @@ class SimpleSandbox2D:
 
     _entities: list[Entity] = []
 
-    def __init__(self, resolution, tps=60, headless=False):
+    def __init__(self, resolution, save_locatiom, tps=60):
         self.resolution = resolution
         self.tps = tps
-        self.headless = headless
-
-        # TODO: Controls with this
-        if self.headless:
-            os.environ["SDL_VIDEODRIVER"] = "dummy"
+        self.save_location = save_locatiom
 
         pg.init()
         self._window = pg.display.set_mode(self.resolution)
         self._clock = pg.time.Clock()
         self._clock.tick(self.tps)
-        pg.display.set_caption("Simple 2D Car Sandbox")
+        pg.display.set_caption("Simple 2D Track Builder")
 
         self._load_entities()
 
     def _load_entities(self):
-        self._entities.append(
-            Car(
-                Texture(
-                    "resources/images/car.png",
-                    display_angle=45,
-                    scale=0.1,
-                    pivot=pg.Vector2(25, 70),
-                ),
-                pg.Vector2(120, 900)
-                # pg.Vector2(self._window.get_width() / 2,
-                #             self._window.get_height() / 2),
-            )
-        )
+        self._entities.append(TrackBuilder(self.save_location))
 
     def start(self):
         self._running = True
@@ -83,18 +66,10 @@ class SimpleSandbox2D:
                         self.stop()
 
                 # fill the screen with a color to wipe away anything from last frame
-                self._window.blit(
-                    Texture(
-                        "resources/images/spa.png",
-                        display_angle=0,
-                        scale=screen_scale,
-                        pivot=None,
-                    ).texture,
-                    (0, 0),
-                )
+                self._window.fill("white")
 
                 font = pygame.font.SysFont(None, 24)
-                fps_counter = font.render(f"FPS: {1 / dt:.2f}", True, "black")
+                fps_counter = font.render(f"FPS: {1/dt:.2f}", True, "black")
                 self._window.blit(fps_counter, (self.resolution[0] - 100, 10))
 
                 keys = pg.key.get_pressed()
@@ -118,16 +93,17 @@ def get_args():
 
     parser.add_argument("--tps", type=int, default=60, help="Ticks per second.")
     parser.add_argument(
-        "--headless",
-        action="store_true",
-        help="Launch the sandbox in headless mode (no GUI).",
-    )
-    parser.add_argument(
         "--resolution",
         type=int,
         default=[1920, 1080],
         nargs=2,
         help="Sandbox window size (width, heigh) in pixels.",
+    )
+    parser.add_argument(
+        "--save-path",
+        type=str,
+        default="tracks/default.json",
+        help="Save location for the designed track.",
     )
 
     return parser.parse_args()
@@ -135,5 +111,7 @@ def get_args():
 
 if __name__ == "__main__":
     args = get_args()
-    game = SimpleSandbox2D(args.resolution, tps=args.tps, headless=args.headless)
+    game = SimpleSandbox2DTrackBuilder(
+        args.resolution, Path(args.save_path), tps=args.tps
+    )
     game.start()

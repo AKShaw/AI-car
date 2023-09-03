@@ -1,12 +1,15 @@
 import json
 import math
 import time
+import tkinter
 from abc import ABC
 from pathlib import Path
 from typing import List
 
 import pygame as pg
 import pygame.font
+
+import tkinter.filedialog
 
 from sandbox.simple_2d_sandbox.textures import Texture
 
@@ -231,7 +234,18 @@ class TrackBuilder(Entity):
         """
         self._clear_track()
 
-        with open(self.track_path, "r") as track_file:
+        # Get load file
+        top = tkinter.Tk()
+        top.withdraw()
+        file_name = tkinter.filedialog.askopenfilename(
+            parent=top, title="Open Track", initialdir=self.track_path.absolute()
+        )
+        top.destroy()
+
+        if file_name == "":
+            return
+
+        with open(file_name, "r") as track_file:
             data = json.load(track_file)
 
             for point in data["points"]:
@@ -255,8 +269,18 @@ class TrackBuilder(Entity):
 
             track_data["points"].append(point_data)
 
-        self.track_path.parent.mkdir(exist_ok=True, parents=True)
-        with open(self.track_path, "w") as track_file:
+        # Get save file
+        top = tkinter.Tk()
+        top.withdraw()
+        file_name = tkinter.filedialog.asksaveasfilename(
+            parent=top, title="Save Track", initialdir=self.track_path.absolute()
+        )
+        top.destroy()
+
+        if file_name == "":
+            return
+
+        with open(file_name, "w") as track_file:
             json.dump(track_data, track_file, indent=4)
 
     def _finalise_track(self):

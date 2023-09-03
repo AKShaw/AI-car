@@ -21,7 +21,7 @@ class SimpleSandbox2DTrackBuilder:
     # Attributes
     tps: int
     resolution: list[int]
-    save_location: Path
+    save_dir: Path
 
     # PyGame
     _window: pg.Surface
@@ -30,10 +30,10 @@ class SimpleSandbox2DTrackBuilder:
 
     _entities: list[Entity] = []
 
-    def __init__(self, resolution, save_locatiom, tps=60):
+    def __init__(self, resolution, save_dir, tps=60):
         self.resolution = resolution
         self.tps = tps
-        self.save_location = save_locatiom
+        self.save_dir = save_dir
 
         pg.init()
         self._window = pg.display.set_mode(self.resolution)
@@ -44,7 +44,7 @@ class SimpleSandbox2DTrackBuilder:
         self._load_entities()
 
     def _load_entities(self):
-        self._entities.append(TrackBuilder(self.save_location))
+        self._entities.append(TrackBuilder(self.save_dir))
 
     def start(self):
         self._running = True
@@ -100,10 +100,10 @@ def get_args():
         help="Sandbox window size (width, heigh) in pixels.",
     )
     parser.add_argument(
-        "--save-path",
+        "--save-dir",
         type=str,
-        default="tracks/default.json",
-        help="Save location for the designed track.",
+        default="tracks/",
+        help="Save directory for the designed track.",
     )
 
     return parser.parse_args()
@@ -112,6 +112,6 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
     game = SimpleSandbox2DTrackBuilder(
-        args.resolution, Path(args.save_path), tps=args.tps
+        args.resolution, Path(args.save_dir), tps=args.tps
     )
     game.start()

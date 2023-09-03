@@ -1,11 +1,11 @@
 import os
 import argparse
+from pathlib import Path
 
-import numpy as np
 import pygame as pg
 import pygame.font
 
-from sandbox.simple_2d_sandbox.entities import Entity, Car
+from sandbox.simple_2d_sandbox.entities import Entity, Car, Track
 from sandbox.simple_2d_sandbox.textures import Texture
 
 
@@ -21,6 +21,7 @@ class SimpleSandbox2D:
 
     # Attributes
     tps: int
+    track_path: Path
     headless: bool
     resolution: list[int]
 
@@ -31,10 +32,11 @@ class SimpleSandbox2D:
 
     _entities: list[Entity] = []
 
-    def __init__(self, resolution, tps=60, headless=False):
+    def __init__(self, resolution, track, tps=60, headless=False):
         self.resolution = resolution
         self.tps = tps
         self.headless = headless
+        self.track_path = Path(track)
 
         # TODO: Controls with this
         if self.headless:
@@ -49,17 +51,18 @@ class SimpleSandbox2D:
         self._load_entities()
 
     def _load_entities(self):
+        track = Track(self.track_path)
+        self._entities.append(track)
+
         self._entities.append(
             Car(
                 Texture(
                     "resources/images/car.png",
-                    display_angle=45,
+                    display_angle=track.get_start_heading(),
                     scale=0.1,
                     pivot=pg.Vector2(25, 70),
                 ),
-                pg.Vector2(120, 900)
-                # pg.Vector2(self._window.get_width() / 2,
-                #             self._window.get_height() / 2),
+                track.get_start_point(),
             )
         )
 
@@ -73,7 +76,6 @@ class SimpleSandbox2D:
     def _game_loop(self):
         try:
             dt = 1 / self.tps
-            screen_scale = list(np.array(self.resolution) / np.array([1920, 1080]))[0]
 
             while self._running:
                 # poll for events
@@ -83,15 +85,7 @@ class SimpleSandbox2D:
                         self.stop()
 
                 # fill the screen with a color to wipe away anything from last frame
-                self._window.blit(
-                    Texture(
-                        "resources/images/spa.png",
-                        display_angle=0,
-                        scale=screen_scale,
-                        pivot=None,
-                    ).texture,
-                    (0, 0),
-                )
+                self._window.fill("white")
 
                 font = pygame.font.SysFont(None, 24)
                 fps_counter = font.render(f"FPS: {1 / dt:.2f}", True, "black")
@@ -129,11 +123,19 @@ def get_args():
         nargs=2,
         help="Sandbox window size (width, heigh) in pixels.",
     )
+    parser.add_argument(
+        "--track",
+        type=str,
+        default="sandbox/simple_2d_sandbox/tracks/track1.json",
+        help="Track file to play on.",
+    )
 
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = get_args()
-    game = SimpleSandbox2D(args.resolution, tps=args.tps, headless=args.headless)
+    game = SimpleSandbox2D(
+        args.resolution, args.track, tps=args.tps, headless=args.headless
+    )
     game.start()

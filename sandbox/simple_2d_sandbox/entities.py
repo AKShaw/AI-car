@@ -336,3 +336,61 @@ class TrackBuilder(Entity):
         """
         self._desired_track_points = []
         self._desired_track_edges = []
+
+
+class Track(Entity):
+    track_path: Path
+    track_points: List[pg.Vector2]
+
+    def __init__(self, track_path):
+        super().__init__(
+            Texture("resources/images/transparent.png", 0, 1), pg.Vector2(0, 0)
+        )
+        self.track_path = track_path
+
+        self._clear_track()
+        self._load_track()
+
+    def _clear_track(self):
+        self.track_points = []
+
+    def _load_track(self):
+        with open(self.track_path, "r") as track_file:
+            data = json.load(track_file)
+
+            for point in data["points"]:
+                self.track_points.append(pg.Vector2(point["x"], point["y"]))
+
+    def draw(self, surface: pg.Surface):
+        previous_point = None
+        for point in self.track_points:
+            pg.draw.circle(surface, "darkgray", point, 50, 50)
+
+            if previous_point is not None:
+                pg.draw.line(surface, "darkgrey", previous_point, point, width=50)
+            previous_point = point
+
+        # Start line:
+        pg.draw.circle(surface, "white", self.track_points[0], 20, 20)
+
+    def get_start_point(self):
+        new_point = pg.Vector2(self.track_points[0].xy)
+        return new_point
+
+    def get_start_heading(self):
+        first = self.track_points[0]
+        delta_x = 0
+        delta_y = 0
+
+        iteration = 1
+        while delta_x == 0 or delta_y == 0:
+            second = self.track_points[iteration]
+            delta_x = second.x - first.x
+            delta_y = second.y - first.y
+            iteration += 1
+
+        heading = math.atan2(delta_y, delta_x) + 90
+
+        if heading < 0:
+            heading += 2 * math.pi
+        return math.degrees(heading)

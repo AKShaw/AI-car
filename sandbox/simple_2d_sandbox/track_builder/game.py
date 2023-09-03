@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 
-import numpy as np
 import pygame as pg
 import pygame.font
 
@@ -56,7 +55,6 @@ class SimpleSandbox2DTrackBuilder:
     def _game_loop(self):
         try:
             dt = 1 / self.tps
-            screen_scale = list(np.array(self.resolution) / np.array([1920, 1080]))[0]
 
             while self._running:
                 # poll for events
